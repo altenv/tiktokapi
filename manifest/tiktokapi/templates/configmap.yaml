@@ -1,0 +1,13 @@
+{{- if .Values.configmap.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "chart.fullname" . }}-configmap
+  labels:
+    app: {{ .Values.appName }}
+data:
+  {{ range .Values.configmap.configs }}
+  {{ .file_name_app }}: |-
+    {{ .config | nindent 4 | trim }}
+  {{- end}}
+{{- end }}

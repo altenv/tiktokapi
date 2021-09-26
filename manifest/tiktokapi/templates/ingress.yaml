@@ -1,0 +1,33 @@
+{{- if .Values.ingress.enabled }}
+{{- range .Values.ingress.hosts }}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "chart.fullname" $ }}-{{ .countrycode }}-ingress
+  labels:
+    app: {{ $.Values.appName }}
+  annotations:
+    {{- if .tls.enabled }}
+    ingress.kubernetes.io/secure-backends: "true"
+    {{- end }}
+    {{- range $key, $value := $.Values.ingress.annotations }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+spec:
+  rules:
+  - host: {{ .name }}
+    http:
+      paths:
+      - path: {{ $.Values.ingress.path }}
+        backend:
+          serviceName: {{ template "chart.fullname" $ }}{{ eq $.Values.ingress.runmode "default" | ternary "" (printf "-%s" $.Values.ingress.runmode) }}-service
+          servicePort: {{ $.Values.ingress.targetPort }}
+  {{- if .tls.enabled }}
+  tls:
+  - hosts:
+    - {{ .name }}
+    secretName: {{ .secretname }}
+  {{- end }}
+---
+{{- end }}
+{{- end }}

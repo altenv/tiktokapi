@@ -1,0 +1,89 @@
+# application name
+appName: tiktokapi
+
+# pods replica
+replicaCount: 2
+
+# image and tag
+image:
+  repository: asia.gcr.io/spid-non-prod/tiktokapi-[YOUR_NAMESPACE]
+  tag: [IMAGE_TAG]
+  pullPolicy: IfNotPresent
+
+# service type
+service:
+  type: ClusterIP
+  port: 8080
+
+# horizontal pod autoscaler configuration
+hpa:
+  enabled: false
+  maxReplicas: 5
+  minReplicas: 1
+  CPUThreshhold: 80
+
+virtualService:
+  enabled: false
+
+# ingress configuration
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/service-upstream: true
+  # path can be overwritten by helm --set-string ingress.path
+  path: /[YOUR_NAMESPACE]//api/puzzle-bobble/
+  hosts:
+    - name: play.test.shopee.co.id
+      secretname: test-id-tls
+      countrycode: id
+      tls:
+        enabled: true
+ 
+configmap:
+  enabled: true
+  config:
+    # Setting for app.conf
+    # ---------------------
+    file_name_app: app.conf
+    configPath: /conf/
+
+    # APP Configuration
+    appname: tiktokapi
+    httpport: 8080
+    runmode: stag 
+    autorender: false
+    copyrequestbody: true
+    enabledocs: true
+
+    # DB Configuration
+    mysqluser: "db user"
+    mysqlpass: "db pass"
+    mysqlhost: "db ip"
+    mysqldb: "db name"
+
+    # Others Configuration
+    secret: "xxxx"
+    campaignpagesize: 5
+    max_csv_file_size: 2097152
+
+    # Connection Configuration
+    max_idle_conn: 10
+    max_open_conn: 50
+
+  environments: {}
+
+resources:
+  limits:
+    cpu: 25m
+    memory: 128Mi
+  requests:
+    cpu: 25m
+    memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

@@ -1,0 +1,91 @@
+# application name
+appName: tiktokapi
+
+# deployment setup
+deployments:
+  - runmode: default
+    replicaCount: 1
+    serviceType: ClusterIP
+    services:
+    - protocolName: http
+      port: 8080
+      targetPort: 5000
+      
+# image configuration
+image:
+  repository: asia.gcr.io/spid-non-prod/tiktokapi
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# pubsub configuration
+pubsub:
+  enabled: false
+  serviceAccount: pubsub-credential
+  filename: credential.json
+
+# gcs configuration
+gcs:
+  enabled: false
+  serviceAccount: gcs-credential
+  filename: google_auth.json
+
+# networking configuration virtual service or ingress resource
+virtualService:
+  enabled: true
+  # change this to your runmode name that use virtualservice
+  # default value "runmode: default"
+  runmode: default
+  path: /api/tiktokapi
+  targetPort: 8080
+  rewrite: /public
+  hosts:
+    - domain: play.test.shopee.co.id
+      enabled: true
+    - domain: play.test.shopee.co.th
+      enabled: true
+    - domain: play.test.shopee.com.my
+      enabled: true
+    - domain: play.test.shopee.sg
+      enabled: true
+    - domain: play.test.shopee.vn
+      enabled: true
+    - domain: play.test.shopee.tw
+      enabled: true
+    - domain: play.test.shopee.ph
+      enabled: true
+    - domain: play.test.shopee.com.br
+      enabled: true
+
+ingress:
+  enabled: false
+
+configmap:
+  enabled: true
+  config:
+    # Setting for app.conf
+    # ---------------------
+    file_name_app: app.ini
+    configPath: /conf/
+
+    # APP Configuration
+    appname: tiktokapi
+    httpport: 8080
+    runmode: prod
+    autorender: false
+    copyrequestbody: true
+    enabledocs: true
+
+resources:
+  limits:
+    cpu: 512m
+    memory: 512Mi
+  requests:
+    cpu: 256m
+    memory: 256Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
